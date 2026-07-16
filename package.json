@@ -1,0 +1,70 @@
+{
+  "name": "@cinatra-ai/image-artifact",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "type": "module",
+  "files": [
+    "src"
+  ],
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "@cinatra-ai/sdk-extensions": "*",
+    "react": "^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@cinatra-ai/sdk-extensions": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "vitest": "^3.0.0"
+  },
+  "cinatra": {
+    "apiVersion": "cinatra.ai/v1",
+    "kind": "artifact",
+    "displayName": "Image",
+    "vendor": {
+      "key": "cinatra-ai",
+      "name": "Cinatra"
+    },
+    "dependencies": [],
+    "artifact": {
+      "accepts": {
+        "file": {
+          "mimeTypes": [
+            "image/*"
+          ]
+        }
+      },
+      "ui": {
+        "abiVersion": 1,
+        "sdkAbiRange": "^2.4.0",
+        "renderers": {
+          "detail": {
+            "entry": "./src/renderers/detail.tsx",
+            "propsApiVersion": 1,
+            "representations": [
+              "image/*"
+            ]
+          },
+          "preview": {
+            "entry": "./src/renderers/preview.tsx",
+            "propsApiVersion": 1,
+            "representations": [
+              "image/*"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
