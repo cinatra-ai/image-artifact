@@ -1,6 +1,6 @@
 {
   "name": "@cinatra-ai/image-artifact",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "Apache-2.0",
   "type": "module",
   "files": [
@@ -64,7 +64,55 @@
             ]
           }
         }
-      }
+      },
+      "objectTypes": [
+        {
+          "type": "@cinatra-ai/image-artifact:image",
+          "claim": "dedicated",
+          "dispositions": {
+            "projection": "artifact-safe",
+            "pinnable": true,
+            "snapshotPolicy": "content",
+            "sensitivity": "normal",
+            "mutability": "record"
+          },
+          "schema": {
+            "type": "object",
+            "properties": {
+              "artifactType": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "mime": {
+                "type": "string"
+              },
+              "size": {
+                "type": "integer"
+              },
+              "originKind": {
+                "type": "string"
+              },
+              "viewerHint": {
+                "type": "string"
+              },
+              "latestRepresentationRevisionId": {
+                "type": "string"
+              },
+              "latestDigest": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "mime",
+              "size",
+              "latestRepresentationRevisionId"
+            ],
+            "additionalProperties": true
+          }
+        }
+      ]
     }
   }
 }
