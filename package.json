@@ -114,5 +114,15 @@
         }
       ]
     }
+  },
+  "exports": {
+    "./src/renderers/detail": {
+      "import": "./src/renderers/detail.tsx",
+      "default": "./src/renderers/detail.tsx"
+    },
+    "./src/renderers/preview": {
+      "import": "./src/renderers/preview.tsx",
+      "default": "./src/renderers/preview.tsx"
+    }
   }
 }
