@@ -49,7 +49,7 @@ describe("image-artifact — every renderer resolves through the package exports
   it("names an exports subpath, and a file on disk, for each declared entry", () => {
     for (const slot of Object.keys(renderers)) {
       const entry = renderers[slot].entry;
-      const subpath = entry.replace(/\.tsx?$/, "").replace(/^\.\//, "./");
+      const subpath = "./" + entry.replace(/\.tsx?$/, "").replace(/^\.\//, "");
       expect(Object.keys(pkg.exports)).toContain(subpath);
       expect(existsSync(fileURLToPath(new URL(`../${entry.slice(2)}`, import.meta.url)))).toBe(
         true,
