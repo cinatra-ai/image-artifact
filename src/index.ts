@@ -39,12 +39,12 @@ export const imageArtifactManifest: SemanticArtifactManifest = {
     renderers: {
       detail: {
         entry: "./src/renderers/detail.tsx",
-        propsApiVersion: 1,
+        propsApiVersion: 2,
         representations: ["image/*"],
       },
       preview: {
         entry: "./src/renderers/preview.tsx",
-        propsApiVersion: 1,
+        propsApiVersion: 2,
         representations: ["image/*"],
       },
     },

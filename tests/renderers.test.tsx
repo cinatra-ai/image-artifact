@@ -8,7 +8,7 @@ import ImagePreviewRenderer from "../src/renderers/preview";
 
 function props(overrides: Partial<ArtifactRendererProps> = {}): ArtifactRendererProps {
   return {
-    propsApiVersion: 1,
+    propsApiVersion: 2,
     artifact: {
       id: "art_1",
       title: "Quarterly dashboard",
@@ -18,12 +18,12 @@ function props(overrides: Partial<ArtifactRendererProps> = {}): ArtifactRenderer
       createdAt: "2026-07-16T00:00:00.000Z",
       updatedAt: "2026-07-16T00:00:00.000Z",
       ownerLevel: "workspace",
-      visibility: "workspace",
+      visibility: "organization",
       sourceUrl: null,
     },
     representation: { revisionId: "rev_1", mime: "image/png" },
     urls: { preview: "/api/artifacts/art_1/versions/rev_1/preview", download: "/dl/art_1" },
-    identity: { kind: "extension", extension: "@cinatra-ai/image-artifact", basis: null, selectable: true },
+    identity: { kind: "extension", extension: "@cinatra-ai/image-artifact" },
     actions: { download: "/dl/art_1", openInSource: null },
     ...overrides,
   };
@@ -89,4 +89,50 @@ describe("ImagePreviewRenderer (representation-viewer slot — host-handler pari
     expect(html).toContain("Image preview unavailable");
     expect(html).toContain('data-floor="no-preview"');
   });
+});
+
+describe("the byte road (props version 2) — both image slots", () => {
+  const ISLAND = "/api/lifecycle-views/artifact-bytes?bc=sealed-preview";
+  const SESSION = "/api/artifacts/art_1/versions/rev_1/preview";
+
+  for (const [name, Renderer] of [
+    ["detail", ImageDetailRenderer],
+    ["preview", ImagePreviewRenderer],
+  ] as const) {
+    it(`${name}: paints the byte reference and no session route at all`, () => {
+      const html = renderToStaticMarkup(
+        createElement(
+          Renderer,
+          props({ bytes: { road: "island", preview: ISLAND, download: null } }),
+        ),
+      );
+      expect(html).toContain(`src="${ISLAND}"`);
+      expect(html).not.toContain(SESSION);
+      expect(html).toContain('data-byte-road="island"');
+    });
+
+    it(`${name}: falls back to the session href on an older snapshot`, () => {
+      const html = renderToStaticMarkup(
+        createElement(Renderer, props({ propsApiVersion: 1 })),
+      );
+      expect(html).toContain(`src="${SESSION}"`);
+      expect(html).toContain('data-byte-road="session"');
+    });
+
+    it(`${name}: floors typed, never blank, when no road carries an address`, () => {
+      const html = renderToStaticMarkup(
+        createElement(
+          Renderer,
+          props({
+            propsApiVersion: 1,
+            urls: { preview: null, download: null },
+            actions: { download: null, openInSource: null },
+          }),
+        ),
+      );
+      expect(html).not.toContain("<img");
+      expect(html).toContain("Image preview unavailable");
+      expect(html).toContain('data-byte-road="none"');
+    });
+  }
 });

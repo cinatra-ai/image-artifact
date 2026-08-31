@@ -9,7 +9,7 @@ import {
 // A complete, valid authorized snapshot; individual tests override fields.
 function props(overrides: Partial<ArtifactRendererProps> = {}): ArtifactRendererProps {
   return {
-    propsApiVersion: 1,
+    propsApiVersion: 2,
     artifact: {
       id: "art_1",
       title: "Quarterly dashboard",
@@ -19,12 +19,12 @@ function props(overrides: Partial<ArtifactRendererProps> = {}): ArtifactRenderer
       createdAt: "2026-07-16T00:00:00.000Z",
       updatedAt: "2026-07-16T00:00:00.000Z",
       ownerLevel: "workspace",
-      visibility: "workspace",
+      visibility: "organization",
       sourceUrl: null,
     },
     representation: { revisionId: "rev_1", mime: "image/png" },
     urls: { preview: "/api/artifacts/art_1/versions/rev_1/preview", download: "/dl/art_1" },
-    identity: { kind: "extension", extension: "@cinatra-ai/image-artifact", basis: null, selectable: true },
+    identity: { kind: "extension", extension: "@cinatra-ai/image-artifact" },
     actions: { download: "/dl/art_1", openInSource: null },
     ...overrides,
   };
@@ -37,6 +37,7 @@ describe("resolveImageView", () => {
       kind: "image",
       src: "/api/artifacts/art_1/versions/rev_1/preview",
       alt: "Quarterly dashboard",
+      road: "session",
     });
   });
 
@@ -69,25 +70,25 @@ describe("resolveImageView", () => {
 
   it("floors (no-preview) when the preview href is null", () => {
     const view = resolveImageView(props({ urls: { preview: null, download: "/dl" } }));
-    expect(view).toEqual({ kind: "floor", reason: "no-preview" });
+    expect(view).toEqual({ kind: "floor", reason: "no-preview", road: "none" });
   });
 
   it("floors (no-preview) when the preview href is an empty string", () => {
     const view = resolveImageView(props({ urls: { preview: "", download: null } }));
-    expect(view).toEqual({ kind: "floor", reason: "no-preview" });
+    expect(view).toEqual({ kind: "floor", reason: "no-preview", road: "none" });
   });
 
   it("floors (malformed-props) when urls is absent", () => {
     // A deliberately malformed snapshot (missing `urls`) must degrade, not throw.
-    const view = resolveImageView({ propsApiVersion: 1 } as Partial<ArtifactRendererProps>);
-    expect(view).toEqual({ kind: "floor", reason: "no-preview" });
+    const view = resolveImageView({ propsApiVersion: 2 } as Partial<ArtifactRendererProps>);
+    expect(view).toEqual({ kind: "floor", reason: "no-preview", road: "none" });
   });
 
   it("floors (malformed-props) on null / undefined / non-object input", () => {
-    expect(resolveImageView(null)).toEqual({ kind: "floor", reason: "malformed-props" });
-    expect(resolveImageView(undefined)).toEqual({ kind: "floor", reason: "malformed-props" });
+    expect(resolveImageView(null)).toEqual({ kind: "floor", reason: "malformed-props", road: "none" });
+    expect(resolveImageView(undefined)).toEqual({ kind: "floor", reason: "malformed-props", road: "none" });
     // @ts-expect-error — exercising a hostile non-object input at runtime.
-    expect(resolveImageView("nope")).toEqual({ kind: "floor", reason: "malformed-props" });
+    expect(resolveImageView("nope")).toEqual({ kind: "floor", reason: "malformed-props", road: "none" });
   });
 
   it("never throws for any of a battery of hostile inputs", () => {
@@ -95,5 +96,51 @@ describe("resolveImageView", () => {
     for (const input of hostile) {
       expect(() => resolveImageView(input as Partial<ArtifactRendererProps>)).not.toThrow();
     }
+  });
+});
+
+describe("resolveImageView — the byte road (props version 2)", () => {
+  const ISLAND = "/api/lifecycle-views/artifact-bytes?bc=sealed-preview";
+
+  it("draws the byte reference, never the cookie-gated session href", () => {
+    const view = resolveImageView(
+      props({ bytes: { road: "island", preview: ISLAND, download: null } }),
+    );
+    expect(view).toEqual({
+      kind: "image",
+      src: ISLAND,
+      alt: "Quarterly dashboard",
+      road: "island",
+    });
+    expect(view).not.toMatchObject({ src: "/api/artifacts/art_1/versions/rev_1/preview" });
+  });
+
+  it("names the session road when the reference was built on a cookie surface", () => {
+    const view = resolveImageView(
+      props({
+        bytes: {
+          road: "session",
+          preview: "/api/artifacts/art_1/versions/rev_1/preview",
+          download: "/dl/art_1",
+        },
+      }),
+    );
+    expect(view).toMatchObject({ kind: "image", road: "session" });
+  });
+
+  it("floors when the reference carries no preview address, even on the island", () => {
+    const view = resolveImageView(
+      props({ bytes: { road: "island", preview: null, download: ISLAND } }),
+    );
+    expect(view).toEqual({ kind: "floor", reason: "no-preview", road: "none" });
+  });
+
+  it("falls back to the session href on an older snapshot that carries no reference", () => {
+    const view = resolveImageView(props({ propsApiVersion: 1 }));
+    expect(view).toMatchObject({
+      kind: "image",
+      src: "/api/artifacts/art_1/versions/rev_1/preview",
+      road: "session",
+    });
   });
 });
