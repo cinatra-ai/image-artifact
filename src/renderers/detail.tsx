@@ -9,12 +9,12 @@
 // not sanitised). Any future inline-SVG path must add a sanitiser or a sandboxed
 // frame.
 //
-// v1 renderer: requests NO host ports. It renders ONLY from the host-supplied
-// authorized snapshot (`ArtifactRendererProps`) — `urls.preview` is already
-// actor-scoped + access-checked by the host. A plain `<img>` (not Next
-// `<Image>`) preserves the host's actor-scoped fetch (Next `<Image>` would route
-// through `/_next/image` and bypass it). Degrades to a never-blank floor when
-// the snapshot carries no drawable representation.
+// It requests NO host ports and renders ONLY from the host-supplied authorized
+// snapshot, painting from the BYTE ROAD the snapshot names — the byte reference
+// at props version 2, the session href where a snapshot was built at the older
+// version. A plain `<img>` (not Next `<Image>`) keeps the host's own address
+// intact (Next `<Image>` would route through `/_next/image` and replace it).
+// Degrades to a never-blank floor when the snapshot carries no address at all.
 
 import type { ReactElement } from "react";
 
@@ -31,6 +31,7 @@ export default function ImageDetailRenderer(props: ArtifactRendererProps): React
         data-artifact-renderer="image"
         data-slot="detail"
         data-floor={view.reason}
+        data-byte-road={view.road}
       >
         {IMAGE_FLOOR_LABEL}.
       </article>
@@ -42,6 +43,7 @@ export default function ImageDetailRenderer(props: ArtifactRendererProps): React
       className="soft-panel rounded-card overflow-hidden p-6"
       data-artifact-renderer="image"
       data-slot="detail"
+      data-byte-road={view.road}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img

@@ -11,9 +11,10 @@
 // never inline `<svg>`) inside the SAME soft-panel card with the SAME image
 // classes as the detail slot.
 //
-// v1 renderer: requests NO host ports; renders ONLY from the authorized snapshot
-// (`urls.preview` is host-authorized + actor-scoped). Degrades to a never-blank
-// floor when the snapshot carries no drawable representation.
+// It requests NO host ports and renders ONLY from the authorized snapshot,
+// painting from the BYTE ROAD the snapshot names — the byte reference at props
+// version 2, the session href at the older version. Degrades to a never-blank
+// floor when the snapshot carries no address at all.
 
 import type { ReactElement } from "react";
 
@@ -30,6 +31,7 @@ export default function ImagePreviewRenderer(props: ArtifactRendererProps): Reac
         data-artifact-renderer="image"
         data-slot="preview"
         data-floor={view.reason}
+        data-byte-road={view.road}
       >
         {IMAGE_FLOOR_LABEL}.
       </article>
@@ -41,6 +43,7 @@ export default function ImagePreviewRenderer(props: ArtifactRendererProps): Reac
       className="soft-panel rounded-card overflow-hidden p-6"
       data-artifact-renderer="image"
       data-slot="preview"
+      data-byte-road={view.road}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
