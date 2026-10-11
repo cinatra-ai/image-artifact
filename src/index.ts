@@ -47,6 +47,10 @@ export const imageArtifactManifest: SemanticArtifactManifest = {
         propsApiVersion: 2,
         representations: ["image/*"],
       },
+      listRow: {
+        entry: "./src/renderers/list-row.tsx",
+        propsApiVersion: 1,
+      },
     },
   },
 };
