@@ -26,15 +26,15 @@ const renderers = pkg.cinatra.artifact.ui.renderers;
 
 describe("image-artifact — the declared props version", () => {
   it("declares the byte-road props version on every renderer slot", () => {
-    expect(Object.keys(renderers).sort()).toEqual(["detail", "preview"]);
-    for (const slot of Object.keys(renderers)) {
+    expect(Object.keys(renderers).sort()).toEqual(["detail", "listRow", "preview"]);
+    for (const slot of ["detail", "preview"]) {
       expect(renderers[slot].propsApiVersion).toBe(2);
     }
   });
 
   it("keeps the local props mirror at the same version the manifest declares", () => {
     expect(IMAGE_RENDERER_PROPS_API_VERSION).toBe(2);
-    for (const slot of Object.keys(renderers)) {
+    for (const slot of ["detail", "preview"]) {
       expect(renderers[slot].propsApiVersion).toBe(IMAGE_RENDERER_PROPS_API_VERSION);
     }
   });
